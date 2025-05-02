@@ -1,6 +1,6 @@
 # top-calculator
 
-This project is the last hands-on task of the foundation course of The Odin
+This project is the final hands-on task of the foundation course of The Odin
 Project (TOP). It combines all basic concepts of html, css and javascript which
 are teached in the curriculum of this course up to this point.
 
