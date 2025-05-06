@@ -1,0 +1,96 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	--top-size: 100px;
+	--middle-size: 500px;
+	--number-gap: 5px;
+	--number-container-size: calc(var(--middle-size) + 2 * var(--number-gap));
+	--number-size: calc((var(--middle-size) - 2 * var(--number-gap)) / 3);
+	--operator-gap: 8px;
+	--operator-size: calc((var(--middle-size) - 2 * var(--operator-gap)) / 4);
+	--bottom-size: var(--number-size);
+}
+
+.calculator {
+	width: 60%;
+	min-height: 100vh;
+	margin: 0 auto;
+	border: 2px solid black;
+	padding: 50px;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.btn {
+	font-size: 50px;
+	font-weight: 900;
+}
+
+
+.top {
+	--size: var(--top-size);
+
+	height: var(--size);
+	font-size: 35px;
+	margin-bottom: 10px;
+	padding: 20px;
+	border: 2px solid red;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.display-operator {
+	color: #777;
+}
+
+.middle {
+	--size: var(--middle-size);
+
+	height: var(--size);
+	margin-bottom: 10px;
+	display: flex;
+}
+
+.middle>.number-container {
+	width: var(--number-container-size);
+	display: flex;
+	gap: var(--number-gap);
+	flex-wrap: wrap;
+}
+
+.number,
+.decimal-point {
+	width: var(--number-size);
+	height: var(--number-size);
+}
+
+.operators {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.operator {
+	--size: calc((var(--middle-size) - 2 * var(--operator-gap)) / 4);
+	width: 100%;
+	height: var(--size);
+}
+
+.bottom {
+	height: var(--bottom-size);
+	display: flex;
+	gap: var(--number-gap);
+}
+
+.equals,
+.clear {
+	flex: 1;
+}
