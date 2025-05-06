@@ -1,36 +1,18 @@
-function add(...numbers) {
-  numbers = numbers.map((number) => parseFloat(number));
-  if (numbers.some((number) => typeof number !== "number")) return null;
-
-  return numbers.reduce((a, b) => a + b, 0);
+function add(a, b) {
+  return a + b;
 }
 
 function subtract(a, b) {
-  a = parseFloat(a);
-  b = parseFloat(b);
-  if (isNaN(a) || isNaN(b)) return null;
-
   return a - b;
 }
 
-function multiply(...numbers) {
-  numbers = numbers.map((number) => parseFloat(number));
-  if (numbers.some((number) => typeof number !== "number")) return null;
-
-  return numbers.reduce((a, b) => a * b, 0);
+function multiply(a, b) {
+  return a * b;
 }
 
 function divide(a, b) {
-  a = parseFloat(a);
-  b = parseFloat(b);
-  if (isNaN(a) || isNaN(b)) return null;
-
   return a / b;
 }
-
-let firstOperand;
-let secondOperand;
-let operator;
 
 function operate(a, b, op) {
   switch (op) {
@@ -44,3 +26,49 @@ function operate(a, b, op) {
       return divide(a, b);
   }
 }
+
+let firstOperand;
+let secondOperand;
+let operator;
+
+function reset() {
+  document.querySelector(".display-operator").textContent = "";
+  document.querySelector(".display-operand").textContent = "0";
+
+  firstOperand = 0;
+  secondOperand = undefined;
+  operator = undefined;
+}
+
+function updateOperand(operand = 0, digit) {
+  return parseFloat(operand.toString() + digit);
+}
+
+function updateDisplay(character) {
+  if (isNaN(parseInt(character))) {
+    document.querySelector(".display-operator").textContent = character;
+  } else {
+    const display = document.querySelector(".display-operand");
+    const operand = display.textContent;
+
+    display.textContent =
+      operand === "0" ? character : operand.trimEnd() + character;
+  }
+}
+
+const clearBtn = document.querySelector(".clear");
+clearBtn.addEventListener("click", reset);
+
+const numbers = document.querySelectorAll(".number-container");
+numbers.forEach((number) => {
+  number.addEventListener("click", (event) => {
+    if (event.target.classList.value === "number-container") return;
+    updateDisplay(event.target.textContent);
+  });
+});
+
+const operators = document.querySelector(".operators");
+operators.addEventListener("click", (event) => {
+  if (event.target.classList.value === "operators") return;
+  updateDisplay(event.target.textContent);
+});
