@@ -27,9 +27,9 @@ function operate(a, b, op) {
   }
 }
 
-let firstOperand;
-let secondOperand;
-let operator;
+let firstOperand = 0;
+let secondOperand = undefined;
+let operator = undefined;
 
 function reset() {
   document.querySelector(".display-operator").textContent = "";
@@ -40,7 +40,7 @@ function reset() {
   operator = undefined;
 }
 
-function updateOperand(operand = 0, digit) {
+function updateOperand(operand, digit) {
   return parseFloat(operand.toString() + digit);
 }
 
@@ -64,6 +64,8 @@ numbers.forEach((number) => {
   number.addEventListener("click", (event) => {
     if (event.target.classList.value === "number-container") return;
     updateDisplay(event.target.textContent);
+    firstOperand = updateOperand(firstOperand, event.target.textContent);
+    console.log(firstOperand);
   });
 });
 
