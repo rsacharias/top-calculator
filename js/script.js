@@ -19,7 +19,6 @@ function operate(a, b, op) {
   a = parseFloat(a);
   b = parseFloat(b);
 
-  console.log(`operate: a = ${a}, b = ${b}`);
   if (isNaN(a) || isNaN(b)) return;
 
   switch (op) {
@@ -40,10 +39,11 @@ let accumulator = "0";
 let nextOperand = "0";
 let operator = undefined;
 
-let clickedEquals = false;
-let clickedOperator = false;
 let isCleared = true;
+let outputToLong = false;
+let clickedEquals = false;
 let dividedByZero = false;
+let clickedOperator = false;
 
 function reset() {
   document.querySelector(".display-operator").textContent = "";
@@ -56,17 +56,14 @@ function reset() {
   isCleared = true;
 }
 
-function checkIfDividedByZero() {
-  if (accumulator === null) {
-    document.querySelector(".display-operand").textContent =
-      "Not in this universe ... !!";
-    dividedByZero = true;
-  }
-}
-
 function clearDisplay(displayPortion) {
   const display = document.querySelector(displayPortion);
   display.textContent = "";
+}
+
+function correct() {
+  nextOperand = nextOperand.slice(0, -1);
+  document.querySelector(".display-operand").textContent = nextOperand;
 }
 
 function updateDisplay(character) {
@@ -91,55 +88,50 @@ function updateDisplay(character) {
       display = document.querySelector(".display-operand");
       const operand = display.textContent;
 
-      if (operand.length >= maxOutputLength) return null;
+      if (operand.length >= maxOutputLength) {
+        outputToLong = true;
+        return;
+      }
 
       display.textContent =
         operand === "0" ? character : operand.trimEnd() + character;
   }
-
-  return display;
 }
 
-const clearBtn = document.querySelector(".clear");
-clearBtn.addEventListener("click", reset);
+function processNumberInput(target) {
+  if (
+    target.classList.value === "number-container" ||
+    (target.classList.contains("decimal-point") &&
+      nextOperand.split("").includes("."))
+  )
+    return;
 
-const numbers = document.querySelectorAll(".number-container");
-numbers.forEach((number) => {
-  number.addEventListener("click", (event) => {
-    if (
-      event.target.classList.value === "number-container" ||
-      (event.target.classList.contains("decimal-point") &&
-        nextOperand.split("").includes("."))
-    )
-      return;
+  if (clickedEquals || dividedByZero) {
+    reset();
+    clickedEquals = false;
+    dividedByZero = false;
+  }
 
-    if (clickedEquals || dividedByZero) {
-      reset();
-      clickedEquals = false;
-      dividedByZero = false;
-    }
+  if (clickedOperator) {
+    clearDisplay(".display-operand");
+    nextOperand = "0";
+    clickedOperator = false;
+  }
 
-    if (clickedOperator) {
-      clearDisplay(".display-operand");
-      nextOperand = "0";
-      clickedOperator = false;
-    }
+  if (outputToLong) {
+    outputToLong = false;
+    return;
+  }
 
-    const digit = event.target.textContent;
-    const display = updateDisplay(digit);
+  const digit = target.textContent;
+  updateDisplay(digit);
+  nextOperand = nextOperand === "0" ? digit : nextOperand + digit;
+}
 
-    // check if to big for display
-    if (display === null) return;
+function processOperatorInput(target) {
+  if (target.classList.value === "operators") return;
 
-    nextOperand = nextOperand === "0" ? digit : nextOperand + digit;
-  });
-});
-
-const operators = document.querySelector(".operators");
-operators.addEventListener("click", (event) => {
-  if (event.target.classList.value === "operators") return;
-
-  operator = event.target.textContent;
+  operator = target.textContent;
   document.querySelector(".display-operator").textContent = operator;
 
   if (clickedOperator) return;
@@ -148,36 +140,86 @@ operators.addEventListener("click", (event) => {
     accumulator = isCleared
       ? nextOperand
       : operate(accumulator, nextOperand, operator);
-  }
 
-  checkIfDividedByZero();
+    if (accumulator === null) {
+      document.querySelector(".display-operand").textContent =
+        "Not in this universe ... !!";
+      dividedByZero = true;
+    }
+  }
 
   clickedOperator = true;
   clickedEquals = false;
   isCleared = false;
-});
+}
 
-const equals = document.querySelector(".equals");
-equals.addEventListener("click", () => {
+function processEqualsInput() {
   accumulator = isCleared
     ? nextOperand
-    : operate(accumulator, nextOperand, operator).toString();
+    : operate(accumulator, nextOperand, operator);
 
-  accumulator =
-    accumulator.length <= maxOutputLength
-      ? accumulator
-      : parseFloat(accumulator).toFixed(maxOutputLength);
+  if (accumulator === null) {
+    dividedByZero = true;
+    document.querySelector(".display-operand").textContent =
+      "Not in this universe ... !!";
+  } else {
+    accumulator = accumulator.toString();
+    accumulator =
+      accumulator.length <= maxOutputLength
+        ? accumulator
+        : parseFloat(accumulator).toFixed(maxOutputLength);
+
+    document.querySelector(".display-operand").textContent = accumulator;
+  }
 
   document.querySelector(".display-operator").textContent = "";
-  document.querySelector(".display-operand").textContent = accumulator;
-
-  checkIfDividedByZero();
-
   clickedEquals = true;
-});
+}
+
+const clearBtn = document.querySelector(".clear");
+clearBtn.addEventListener("click", reset);
+
+const numbers = document.querySelectorAll(".number-container");
+numbers.forEach((number) =>
+  number.addEventListener("click", (event) => processNumberInput(event.target)),
+);
+
+const operators = document.querySelector(".operators");
+operators.addEventListener("click", (event) =>
+  processOperatorInput(event.target),
+);
+
+const equals = document.querySelector(".equals");
+equals.addEventListener("click", processEqualsInput);
 
 const backspace = document.querySelector(".backspace");
-backspace.addEventListener("click", () => {
-  nextOperand = nextOperand.slice(0, -1);
-  document.querySelector(".display-operand").textContent = nextOperand;
+backspace.addEventListener("click", () => correct);
+
+window.addEventListener("keydown", (event) => {
+  const key = document.querySelector(`.btn[data-key="${event.key}"]`);
+  if (key === null) return;
+
+  switch (event.key) {
+    case "Backspace":
+      correct();
+      break;
+
+    case "Delete":
+      reset();
+      break;
+
+    case "=":
+      processEqualsInput();
+      break;
+
+    case "+":
+    case "-":
+    case "*":
+    case "/":
+      processOperatorInput(key);
+      break;
+
+    default:
+      processNumberInput(key);
+  }
 });
