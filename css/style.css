@@ -15,26 +15,43 @@
 	--bottom-size: var(--number-size);
 }
 
-.calculator {
-	width: 60%;
+body {
+	background-image: url("../img/school-board.jpg");
+	background-repeat: no-repeat;
+	background-size: 100%;
 	min-height: 100vh;
-	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.calculator {
+	background-color: #222;
+	width: 50%;
+	min-height: 80vh;
 	border: 2px solid black;
-	padding: 50px;
+	padding: 10px;
 
 	display: flex;
 	flex-direction: column;
 }
 
 .btn {
+	background-color: #555;
+	color: white;
+
 	font-size: 50px;
 	font-weight: 900;
+
+	border-radius: 10px;
 }
 
 
 .top {
 	--size: var(--top-size);
 
+	background-color: #888;
 	height: var(--size);
 	font-size: 35px;
 	margin-bottom: 10px;
@@ -47,7 +64,7 @@
 }
 
 .display-operator {
-	color: #777;
+	color: #333;
 }
 
 .middle {
@@ -67,6 +84,7 @@
 
 .number,
 .decimal-point {
+
 	width: var(--number-size);
 	height: var(--number-size);
 }

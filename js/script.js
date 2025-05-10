@@ -11,6 +11,7 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+  if (b === 0) return null;
   return a / b;
 }
 
@@ -33,6 +34,8 @@ function operate(a, b, op) {
   }
 }
 
+const maxOutputLength = 25;
+
 let accumulator = "0";
 let nextOperand = "0";
 let operator = undefined;
@@ -40,6 +43,7 @@ let operator = undefined;
 let clickedEquals = false;
 let clickedOperator = false;
 let isCleared = true;
+let dividedByZero = false;
 
 function reset() {
   document.querySelector(".display-operator").textContent = "";
@@ -50,6 +54,14 @@ function reset() {
   operator = undefined;
 
   isCleared = true;
+}
+
+function checkIfDividedByZero() {
+  if (accumulator === null) {
+    document.querySelector(".display-operand").textContent =
+      "Not in this universe ... !!";
+    dividedByZero = true;
+  }
 }
 
 function clearDisplay(displayPortion) {
@@ -79,6 +91,8 @@ function updateDisplay(character) {
       display = document.querySelector(".display-operand");
       const operand = display.textContent;
 
+      if (operand.length >= maxOutputLength) return null;
+
       display.textContent =
         operand === "0" ? character : operand.trimEnd() + character;
   }
@@ -99,9 +113,10 @@ numbers.forEach((number) => {
     )
       return;
 
-    if (clickedEquals) {
+    if (clickedEquals || dividedByZero) {
       reset();
       clickedEquals = false;
+      dividedByZero = false;
     }
 
     if (clickedOperator) {
@@ -111,7 +126,11 @@ numbers.forEach((number) => {
     }
 
     const digit = event.target.textContent;
-    updateDisplay(digit);
+    const display = updateDisplay(digit);
+
+    // check if to big for display
+    if (display === null) return;
+
     nextOperand = nextOperand === "0" ? digit : nextOperand + digit;
   });
 });
@@ -131,6 +150,8 @@ operators.addEventListener("click", (event) => {
       : operate(accumulator, nextOperand, operator);
   }
 
+  checkIfDividedByZero();
+
   clickedOperator = true;
   clickedEquals = false;
   isCleared = false;
@@ -140,10 +161,23 @@ const equals = document.querySelector(".equals");
 equals.addEventListener("click", () => {
   accumulator = isCleared
     ? nextOperand
-    : operate(accumulator, nextOperand, operator);
+    : operate(accumulator, nextOperand, operator).toString();
+
+  accumulator =
+    accumulator.length <= maxOutputLength
+      ? accumulator
+      : parseFloat(accumulator).toFixed(maxOutputLength);
 
   document.querySelector(".display-operator").textContent = "";
   document.querySelector(".display-operand").textContent = accumulator;
 
+  checkIfDividedByZero();
+
   clickedEquals = true;
+});
+
+const backspace = document.querySelector(".backspace");
+backspace.addEventListener("click", () => {
+  nextOperand = nextOperand.slice(0, -1);
+  document.querySelector(".display-operand").textContent = nextOperand;
 });
